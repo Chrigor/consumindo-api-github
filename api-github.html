@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>GitHub</title>
+
+    <style>
+        .result {
+            width: 600px;
+            margin: 10px auto;
+            background: #836FFF;
+            border-radius: 20px;
+            padding: 20px 30px;
+            text-align: center;
+
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 15pt;
+        }
+
+        .result img {
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+        }
+
+        .result figcaption {
+            color: white;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 15pt;
+        }
+
+        .result input {
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .result input[type="button"]:hover {
+            cursor: pointer;
+        }
+
+        .result p {
+            color: rgba(220, 10, 10, 1);
+            font-size: 12pt;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <section class="result">
+        <label for="userGithub">Digite seu user GitHub: </label>
+        <input type="text" name="" id="userGithub">
+        <input type="button" value="Pesquisar" id="button">
+        <figure>
+            <img id="avatar" src="padrao.png">
+        </figure>
+        <figcaption id="nome">
+            Name
+        </figcaption>
+
+        <p id="erro">Input invalido. Verifique os Dados informados.</p>
+    </section>
+
+    <script>
+
+        let $button = document.getElementById('button')
+
+        $button.addEventListener('click', getData)
+
+        function getData() {
+
+            if (validarInput()) {
+                let $nome = document.getElementById('userGithub')
+
+                fetch(`https://api.github.com/users/${$nome.value}`)
+                    .then((response) => {
+                        if (response.status == 200) {
+                            return response.json()
+                        }
+
+                        throw new Error('Usuário não encontrado.')
+                    })
+                    .then((data) => {
+                        atualizarInterfaceGrafica(data)
+
+                    }).catch((erro) => {
+                        revelarErro()
+                    })
+
+                esconderErro()
+            } else {
+                revelarErro()
+            }
+
+        }
+
+
+        function atualizarInterfaceGrafica(data) {
+            let $img = document.getElementById('avatar')
+            let $name = document.getElementById('nome')
+            $name.innerHTML = data.login
+            $img.src = data.avatar_url
+        }
+
+        function validarInput() {
+            let $nome = document.getElementById('userGithub')
+
+            return $nome.value.length > 0 ? true : false
+        }
+
+        function revelarErro() {
+            let $erro = document.getElementById('erro')
+
+            $erro.style.display = "block";
+        }
+        function esconderErro() {
+            let $erro = document.getElementById('erro')
+
+            $erro.style.display = "none";
+        }
+    </script>
+</body>
+
+</html>
